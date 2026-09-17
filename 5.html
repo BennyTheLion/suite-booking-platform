@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SuiteTime - הזמנת סוויטות וחדרים לפי שעה בדיסקרטיות מלאה.">
+  <title>SuiteTime | סוויטות דיסקרטיות לפי שעה</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* ============================
+       THEMES
+       ============================ */
+    :root, [data-theme="burgundy"] {
+      --bg: #faf7f4; --surface: #ffffff; --surface-alt: #f3eae4;
+      --text: #2b2430; --muted: #7a6f78;
+      --primary: #8b2942; --primary-hover: #6e1f33; --primary-text: #ffffff;
+      --accent: #d9a5a5; --chip: #f4ece6; --border: #e9dfd7;
+      --shadow: rgba(43, 36, 48, 0.08);
+      --hero-overlay: rgba(48, 18, 26, 0.75); --hero-overlay-2: rgba(48, 18, 26, 0.42);
+    }
+    [data-theme="midnight"] {
+      --bg: #0f0f12; --surface: #1a1a1f; --surface-alt: #15151a;
+      --text: #f5f5f7; --muted: #a0a0a8;
+      --primary: #c9a96e; --primary-hover: #b8934f; --primary-text: #0f0f12;
+      --accent: #6e5a3a; --chip: #23232a; --border: #2a2a32;
+      --shadow: rgba(0,0,0,0.5);
+      --hero-overlay: rgba(0,0,0,0.78); --hero-overlay-2: rgba(0,0,0,0.5);
+    }
+    [data-theme="ocean"] {
+      --bg: #f2f7f9; --surface: #ffffff; --surface-alt: #e4eef2;
+      --text: #16262e; --muted: #5a7079;
+      --primary: #0f6b7a; --primary-hover: #0a505c; --primary-text: #ffffff;
+      --accent: #7ec5cf; --chip: #e6f1f4; --border: #d5e3e8;
+      --shadow: rgba(22, 38, 46, 0.08);
+      --hero-overlay: rgba(6, 34, 40, 0.75); --hero-overlay-2: rgba(6, 34, 40, 0.42);
+    }
+    [data-theme="forest"] {
+      --bg: #f4f6f1; --surface: #ffffff; --surface-alt: #e7ece0;
+      --text: #1f2a1c; --muted: #64705f;
+      --primary: #3f6b3a; --primary-hover: #2f5229; --primary-text: #ffffff;
+      --accent: #9cb894; --chip: #eaf0e4; --border: #d9e0d1;
+      --shadow: rgba(31, 42, 28, 0.08);
+      --hero-overlay: rgba(20, 32, 18, 0.75); --hero-overlay-2: rgba(20, 32, 18, 0.42);
+    }
+    [data-theme="lavender"] {
+      --bg: #f8f6fb; --surface: #ffffff; --surface-alt: #efeaf7;
+      --text: #241e33; --muted: #6f6784;
+      --primary: #6c4cb3; --primary-hover: #523a8a; --primary-text: #ffffff;
+      --accent: #c2b0e6; --chip: #f1ecfa; --border: #e2daf0;
+      --shadow: rgba(36, 30, 51, 0.08);
+      --hero-overlay: rgba(28, 20, 50, 0.78); --hero-overlay-2: rgba(28, 20, 50, 0.45);
+    }
+    [data-theme="sunset"] {
+      --bg: #fdf6ef; --surface: #ffffff; --surface-alt: #fbe9d5;
+      --text: #2e1f12; --muted: #7d6650;
+      --primary: #d2691e; --primary-hover: #a95114; --primary-text: #ffffff;
+      --accent: #f0b37e; --chip: #fbeadb; --border: #f0dcc5;
+      --shadow: rgba(46, 31, 18, 0.08);
+      --hero-overlay: rgba(54, 26, 8, 0.75); --hero-overlay-2: rgba(54, 26, 8, 0.42);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.6;
+      transition: background 0.35s ease, color 0.35s ease;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    img { max-width: 100%; display: block; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+    /* ============================
+       HEADER
+       ============================ */
+    .header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      border-bottom: 1px solid transparent;
+      color: #fff;
+      transition: background 0.35s ease, border-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 76px; gap: 20px; }
+
+    .logo { font-size: 1.5rem; font-weight: 700; letter-spacing: 1px; white-space: nowrap; color: #fff; transition: color 0.35s ease; }
+    .logo span { color: rgba(255, 255, 255, 0.6); transition: color 0.35s ease; }
+
+    .nav nav { display: flex; gap: 30px; }
+    .nav nav a { color: rgba(255, 255, 255, 0.82); font-weight: 500; transition: color 0.25s; }
+    .nav nav a:hover { color: #fff; }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+    .btn {
+      display: inline-block; padding: 10px 22px; border-radius: 30px;
+      font-weight: 600; transition: all 0.3s; cursor: pointer;
+      border: none; font-family: inherit; font-size: 0.95rem;
+    }
+    .btn-outline { border: 1px solid var(--primary); color: var(--primary); background: transparent; }
+    .btn-outline:hover { background: var(--primary); color: var(--primary-text); }
+    .btn-primary { background: var(--primary); color: var(--primary-text); }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-block { display: block; width: 100%; text-align: center; }
+    .btn-large { padding: 15px 40px; font-size: 1.1rem; }
+
+    .header .btn-outline {
+      border-color: rgba(255, 255, 255, 0.5);
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+    }
+    .header .btn-outline:hover { background: #fff; color: #14110d; border-color: #fff; }
+
+    .palette-toggle {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 42px; height: 42px; border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      color: #fff; cursor: pointer; font-size: 1.2rem;
+      transition: transform 0.3s, border-color 0.3s, background 0.35s, color 0.35s;
+    }
+    .palette-toggle:hover { transform: rotate(45deg); border-color: #fff; }
+
+    .header.scrolled {
+      background: var(--bg);
+      border-bottom-color: var(--border);
+      color: var(--text);
+      box-shadow: 0 6px 24px var(--shadow);
+    }
+    .header.scrolled .logo { color: var(--text); }
+    .header.scrolled .logo span { color: var(--primary); }
+    .header.scrolled nav a { color: var(--muted); }
+    .header.scrolled nav a:hover { color: var(--primary); }
+    .header.scrolled .btn-outline {
+      border-color: var(--primary); color: var(--primary);
+      background: transparent; backdrop-filter: none;
+    }
+    .header.scrolled .btn-outline:hover { background: var(--primary); color: var(--primary-text); }
+    .header.scrolled .palette-toggle {
+      border-color: var(--border); background: var(--surface);
+      color: var(--text); backdrop-filter: none;
+    }
+    .header.scrolled .palette-toggle:hover { border-color: var(--primary); }
+
+    /* ============================
+       HERO
+       ============================ */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; isolation: isolate;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      z-index: -2;
+      filter: saturate(0.95) contrast(1.03);
+      transform: scale(1.02);
+      transition: transform 8s ease;
+    }
+    .hero.loaded .hero-bg { transform: scale(1); }
+
+    .hero-overlay {
+      position: absolute; inset: 0; z-index: -1;
+      background: linear-gradient(180deg,
+        var(--hero-overlay) 0%,
+        var(--hero-overlay-2) 38%,
+        var(--hero-overlay-2) 62%,
+        var(--hero-overlay) 100%);
+      transition: background 0.4s ease;
+    }
+
+    .hero-content {
+      text-align: center; max-width: 960px;
+      padding: 120px 20px 100px;
+      position: relative; z-index: 2; width: 100%;
+    }
+
+    .hero-kicker {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 4px;
+      text-transform: uppercase; color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 26px;
+    }
+    .hero-kicker::before,
+    .hero-kicker::after {
+      content: ''; width: 32px; height: 1px;
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+      font-weight: 900; line-height: 1.08;
+      letter-spacing: -1.5px; margin-bottom: 22px;
+      color: #fff; text-shadow: 0 4px 30px rgba(0, 0, 0, 0.35);
+    }
+    .hero h1 span { color: #fff; display: inline-block; position: relative; }
+    .hero h1 span::after {
+      content: ''; position: absolute;
+      left: 0; right: 0; bottom: 0.08em;
+      height: 0.14em; background: var(--accent);
+      border-radius: 4px; opacity: 0.85; z-index: -1;
+    }
+
+    .hero > .container > p,
+    .hero-content p {
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      color: rgba(255, 255, 255, 0.88);
+      margin-bottom: 46px; max-width: 620px;
+      margin-inline: auto;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    /* ============================
+       CONTACT CARD (replaces search)
+       ============================ */
+    .contact-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      text-align: start;
+    }
+
+    .contact-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 22px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 26px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+      transition: background 0.35s, border-color 0.35s, transform 0.3s;
+    }
+    .contact-card:hover { transform: translateY(-3px); }
+
+    .contact-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      color: var(--primary-text);
+      flex-shrink: 0;
+      transition: background 0.35s, color 0.35s;
+      box-shadow: 0 8px 20px var(--shadow);
+      position: relative;
+    }
+    .contact-icon::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 1px solid var(--primary);
+      opacity: 0.25;
+      animation: ring 2.4s ease-in-out infinite;
+    }
+    @keyframes ring {
+      0%, 100% { transform: scale(1); opacity: 0.25; }
+      50% { transform: scale(1.12); opacity: 0; }
+    }
+    .contact-icon svg { width: 24px; height: 24px; }
+
+    .contact-body { min-width: 0; }
+
+    .contact-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .contact-label .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #2ecc71;
+      box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.22);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .contact-number {
+      display: inline-block;
+      font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      color: var(--text);
+      direction: ltr;
+      font-variant-numeric: tabular-nums;
+      transition: color 0.3s;
+    }
+    .contact-number:hover { color: var(--primary); }
+
+    .contact-sub {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .contact-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      transition: all 0.25s;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .contact-btn svg { width: 16px; height: 16px; }
+
+    .contact-btn-primary {
+      background: var(--primary);
+      color: var(--primary-text);
+      border-color: var(--primary);
+    }
+    .contact-btn-primary:hover {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .contact-btn-wa {
+      background: transparent;
+      color: #25D366;
+      border-color: rgba(37, 211, 102, 0.5);
+    }
+    .contact-btn-wa:hover {
+      background: #25D366;
+      color: #fff;
+      border-color: #25D366;
+      transform: translateY(-2px);
+    }
+
+    /* Trust pills */
+    .contact-pills {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+    .contact-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .contact-pill .check {
+      color: #2ecc71;
+      font-weight: 900;
+    }
+
+    /* Scroll cue */
+    .scroll-cue {
+      position: absolute; bottom: 26px; left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.68rem; letter-spacing: 3px;
+      text-transform: uppercase;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      z-index: 3;
+      animation: bob 2.4s ease-in-out infinite;
+    }
+    .scroll-cue::after {
+      content: ''; width: 1px; height: 30px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.7), transparent);
+    }
+    @keyframes bob {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, 6px); }
+    }
+
+    /* ============================
+       SECTIONS
+       ============================ */
+    .section { padding: 90px 0; }
+    .section-dark { background: var(--surface-alt); transition: background 0.35s ease; }
+
+    .section-header { text-align: center; margin-bottom: 55px; }
+    .section-header h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      font-weight: 800; letter-spacing: -1px; margin-bottom: 10px;
+    }
+    .section-header p { color: var(--muted); font-size: 1.08rem; }
+
+    .grid { display: grid; gap: 30px; }
+    .cards { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .features { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .steps { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+
+    .card {
+      background: var(--surface); border-radius: 12px; overflow: hidden;
+      border: 1px solid var(--border);
+      transition: transform 0.3s, box-shadow 0.3s, background 0.35s, border-color 0.35s;
+      box-shadow: 0 4px 14px var(--shadow);
+    }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px var(--shadow); }
+
+    .card-img {
+      height: 200px; position: relative;
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 15px;
+    }
+    .card-img.c1 { background: linear-gradient(135deg, #6e1f33, #b1506b); }
+    .card-img.c2 { background: linear-gradient(135deg, #7a5c8f, #c79fc0); }
+    .card-img.c3 { background: linear-gradient(135deg, #a65a4a, #e0a48f); }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.94); color: var(--primary);
+      padding: 5px 12px; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 700;
+      transition: color 0.35s;
+    }
+    .price {
+      background: var(--primary); color: var(--primary-text);
+      padding: 5px 12px; border-radius: 20px;
+      font-weight: 700; font-size: 0.9rem;
+      transition: background 0.35s, color 0.35s;
+    }
+
+    .card-body { padding: 25px; }
+    .card-body h3 { font-size: 1.4rem; margin-bottom: 5px; }
+    .location { color: var(--muted); margin-bottom: 15px; }
+
+    .amenities { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    .amenities li {
+      background: var(--chip); padding: 5px 12px; border-radius: 20px;
+      font-size: 0.85rem; color: var(--muted);
+      transition: background 0.35s;
+    }
+
+    .feature {
+      text-align: center; padding: 30px 20px;
+      background: var(--surface); border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 14px var(--shadow);
+      transition: background 0.35s, border-color 0.35s, transform 0.3s;
+    }
+    .feature:hover { transform: translateY(-4px); }
+    .feature .icon { font-size: 2.5rem; margin-bottom: 15px; }
+    .feature h3 { margin-bottom: 10px; }
+    .feature p { color: var(--muted); font-size: 0.95rem; }
+
+    .step {
+      text-align: center; padding: 30px;
+      background: var(--surface); border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 14px var(--shadow);
+      transition: background 0.35s, border-color 0.35s, transform 0.3s;
+    }
+    .step:hover { transform: translateY(-4px); }
+    .step-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 50px; height: 50px; border-radius: 50%;
+      background: var(--primary); color: var(--primary-text);
+      font-weight: 800; font-size: 1.3rem; margin-bottom: 20px;
+      transition: background 0.35s, color 0.35s;
+    }
+    .step h3 { margin-bottom: 10px; }
+    .step p { color: var(--muted); }
+
+    .cta {
+      padding: 90px 0; text-align: center;
+      background: linear-gradient(135deg, var(--surface-alt), var(--bg));
+      transition: background 0.35s ease;
+    }
+    .cta h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      margin-bottom: 15px; letter-spacing: -1px;
+    }
+    .cta p { color: var(--muted); font-size: 1.15rem; margin-bottom: 32px; }
+
+    .footer {
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 60px 0 20px;
+      transition: background 0.35s, border-color 0.35s;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px; margin-bottom: 40px;
+    }
+    .footer .logo { display: inline-block; margin-bottom: 15px; color: var(--text); }
+    .footer .logo span { color: var(--primary); }
+    .footer p { color: var(--muted); font-size: 0.95rem; }
+    .footer h4 { margin-bottom: 20px; font-size: 1.05rem; }
+    .footer ul li { margin-bottom: 10px; color: var(--muted); }
+    .footer ul li a:hover { color: var(--primary); }
+
+    .social { display: flex; gap: 15px; }
+    .social a { font-size: 1.5rem; }
+
+    .footer-bottom {
+      text-align: center; padding-top: 20px;
+      border-top: 1px solid var(--border);
+      color: var(--muted); font-size: 0.9rem;
+    }
+    .footer-bottom a { color: var(--primary); }
+
+    /* ============================
+       PALETTE PANEL
+       ============================ */
+    .palette-panel {
+      position: fixed; top: 92px; inset-inline-end: 20px;
+      width: 320px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 24px 60px var(--shadow);
+      padding: 22px; z-index: 200;
+      opacity: 0; transform: translateY(-10px) scale(0.98);
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease, background 0.35s, border-color 0.35s;
+    }
+    .palette-panel.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+    .palette-panel h3 { font-size: 1.05rem; margin-bottom: 4px; }
+    .palette-panel > p { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; }
+
+    .swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .swatch {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 10px 6px; border-radius: 12px;
+      border: 2px solid transparent; background: transparent;
+      cursor: pointer; font-family: inherit;
+      font-size: 0.75rem; color: var(--muted);
+      transition: border-color 0.25s, background 0.25s, color 0.25s;
+    }
+    .swatch:hover { background: var(--chip); }
+    .swatch.active { border-color: var(--primary); color: var(--text); font-weight: 600; }
+    .swatch-colors {
+      display: flex; width: 46px; height: 46px; border-radius: 50%;
+      overflow: hidden; border: 2px solid var(--border);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    .swatch-colors span { flex: 1; }
+
+    /* ============================
+       RESPONSIVE
+       ============================ */
+    @media (max-width: 992px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .contact-card { grid-template-columns: auto 1fr; }
+      .contact-actions { grid-column: 1 / -1; flex-direction: row; }
+      .contact-actions .contact-btn { flex: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .nav nav { display: none; }
+      .hero-content { padding: 120px 20px 90px; }
+      .contact-card { padding: 20px; gap: 16px; }
+      .contact-icon { width: 50px; height: 50px; }
+      .contact-icon svg { width: 20px; height: 20px; }
+      .footer-grid { grid-template-columns: 1fr; text-align: center; }
+      .social { justify-content: center; }
+      .palette-panel { inset-inline: 12px; width: auto; top: 84px; }
+      .contact-pill { font-size: 0.72rem; padding: 6px 12px; }
+    }
+
+    @media (max-width: 480px) {
+      .nav-actions .btn-outline { display: none; }
+      .hero h1 { font-size: 2rem; }
+      .contact-card { grid-template-columns: 1fr; text-align: center; }
+      .contact-icon { margin: 0 auto; }
+      .contact-label { justify-content: center; }
+      .contact-actions { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header" id="header">
+    <div class="container nav">
+      <a href="#" class="logo">Suite<span>Time</span></a>
+      <nav>
+        <a href="#suites">סוויטות</a>
+        <a href="#how">איך זה עובד</a>
+        <a href="#features">יתרונות</a>
+        <a href="#contact">צור קשר</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="palette-toggle" id="paletteToggle" aria-label="בחר ערכת צבעים">🎨</button>
+        <a href="tel:031234567" class="btn btn-outline">התקשר עכשיו</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Palette Panel -->
+  <div class="palette-panel" id="palettePanel" role="dialog" aria-label="בחירת ערכת צבעים">
+    <h3>ערכת צבעים</h3>
+    <p>בחר סגנון שמתאים לאווירה שלך.</p>
+    <div class="swatches" id="swatches">
+      <button class="swatch" data-theme="burgundy">
+        <span class="swatch-colors"><span style="background:#8b2942"></span><span style="background:#d9a5a5"></span><span style="background:#faf7f4"></span></span>
+        בורגונדי
+      </button>
+      <button class="swatch" data-theme="midnight">
+        <span class="swatch-colors"><span style="background:#c9a96e"></span><span style="background:#1a1a1f"></span><span style="background:#0f0f12"></span></span>
+        חצות
+      </button>
+      <button class="swatch" data-theme="ocean">
+        <span class="swatch-colors"><span style="background:#0f6b7a"></span><span style="background:#7ec5cf"></span><span style="background:#f2f7f9"></span></span>
+        אוקיינוס
+      </button>
+      <button class="swatch" data-theme="forest">
+        <span class="swatch-colors"><span style="background:#3f6b3a"></span><span style="background:#9cb894"></span><span style="background:#f4f6f1"></span></span>
+        יער
+      </button>
+      <button class="swatch" data-theme="lavender">
+        <span class="swatch-colors"><span style="background:#6c4cb3"></span><span style="background:#c2b0e6"></span><span style="background:#f8f6fb"></span></span>
+        לבנדר
+      </button>
+      <button class="swatch" data-theme="sunset">
+        <span class="swatch-colors"><span style="background:#d2691e"></span><span style="background:#f0b37e"></span><span style="background:#fdf6ef"></span></span>
+        שקיעה
+      </button>
+    </div>
+  </div>
+
+  <!-- Hero with IMAGE + CONTACT CARD -->
+  <section class="hero" id="search">
+    <img
+      class="hero-bg"
+      src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=1900&q=80"
+      alt="סוויטה מעוצבת עם תאורה חמה"
+      loading="eager"
+      fetchpriority="high"
+    >
+    <div class="hero-overlay"></div>
+
+    <div class="container hero-content">
+      <div class="hero-kicker">SuiteTime · Israel</div>
+
+      <h1>חדרים לפי שעה, <span>בדיסקרטיות מלאה</span></h1>
+
+      <p>שיחה אחת ואנחנו מסדרים לך חדר. ללא זיהוי, ללא מפגש, ללא שאלות.</p>
+
+      <!-- Contact card (replaces the search box) -->
+      <div class="contact-wrap">
+        <div class="contact-card">
+
+          <div class="contact-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+
+          <div class="contact-body">
+            <div class="contact-label">
+              <span class="live-dot"></span>
+              זמין כעת · 24/7
+            </div>
+            <a href="tel:031234567" class="contact-number">03-123-4567</a>
+            <div class="contact-sub">מענה אנושי תוך 10 שניות · ללא זיהוי</div>
+          </div>
+
+          <div class="contact-actions">
+            <a href="tel:031234567" class="contact-btn contact-btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+              התקשר
+            </a>
+            <a href="https://wa.me/97231234567" class="contact-btn contact-btn-wa" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.52 3.48A11.87 11.87 0 0 0 12.05 0C5.5 0 .17 5.33.17 11.88c0 2.09.55 4.13 1.6 5.93L0 24l6.35-1.67a11.84 11.84 0 0 0 5.7 1.46h.01c6.55 0 11.88-5.33 11.88-11.88 0-3.17-1.24-6.15-3.42-8.43zm-8.47 18.28h-.01a9.85 9.85 0 0 1-5.02-1.38l-.36-.21-3.77.99 1.01-3.68-.23-.38a9.85 9.85 0 0 1-1.51-5.22c0-5.45 4.44-9.88 9.9-9.88a9.83 9.83 0 0 1 7 2.9 9.83 9.83 0 0 1 2.9 7c0 5.45-4.44 9.88-9.9 9.88zm5.42-7.4c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.48-1.75-1.65-2.05-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.1 4.49.71.31 1.27.49 1.71.63.72.23 1.37.2 1.89.12.58-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35z"/>
+              </svg>
+              וואטסאפ
+            </a>
+          </div>
+        </div>
+
+        <div class="contact-pills">
+          <span class="contact-pill"><span class="check">✓</span> ללא זיהוי</span>
+          <span class="contact-pill"><span class="check">✓</span> מענה אנושי</span>
+          <span class="contact-pill"><span class="check">✓</span> אישור מיידי</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-cue">גלול</div>
+  </section>
+
+  <!-- Suites -->
+  <section id="suites" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>סוויטות מומלצות</h2>
+        <p>מבחר חדרים דיסקרטיים עם כל מה שצריך לחוויה מושלמת.</p>
+      </div>
+      <div class="grid cards">
+        <article class="card">
+          <div class="card-img c1">
+            <span class="badge">דיסקרטי</span>
+            <span class="price">₪200 / שעה</span>
+          </div>
+          <div class="card-body">
+            <h3>סוויטת בלאק TLV</h3>
+            <p class="location">תל אביב</p>
+            <ul class="amenities">
+              <li>🛁 ג'קוזי</li><li>🚗 חניה פרטית</li><li>🔑 צ'ק-אין עצמי</li>
+            </ul>
+            <a href="tel:031234567" class="btn btn-primary btn-block">התקשר להזמנה</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-img c2">
+            <span class="badge">VIP</span>
+            <span class="price">₪250 / שעה</span>
+          </div>
+          <div class="card-body">
+            <h3>אלמוג ביץ' VIP</h3>
+            <p class="location">חיפה</p>
+            <ul class="amenities">
+              <li>🌊 נוף לים</li><li>🚗 חניה פרטית</li><li>💳 תשלום אנונימי</li>
+            </ul>
+            <a href="tel:031234567" class="btn btn-primary btn-block">התקשר להזמנה</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-img c3">
+            <span class="badge">רומנטי</span>
+            <span class="price">₪180 / שעה</span>
+          </div>
+          <div class="card-body">
+            <h3>פלמה הוטל</h3>
+            <p class="location">הרצליה</p>
+            <ul class="amenities">
+              <li>🛏️ מיטה מרופדת</li><li>📶 Wi-Fi</li><li>🔒 כניסה נפרדת</li>
+            </ul>
+            <a href="tel:031234567" class="btn btn-primary btn-block">התקשר להזמנה</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="section section-dark">
+    <div class="container">
+      <div class="section-header">
+        <h2>למה לבחור בנו?</h2>
+        <p>הדיסקרטיות שלך היא העדיפות הראשונה שלנו.</p>
+      </div>
+      <div class="grid features">
+        <div class="feature"><div class="icon">🔑</div><h3>כניסה דיסקרטית</h3><p>כניסה נפרדת ללא פגישה עם צוות או אורחים.</p></div>
+        <div class="feature"><div class="icon">🚗</div><h3>חניה פרטית</h3><p>חניה מקורה ומוסתרת מהעין.</p></div>
+        <div class="feature"><div class="icon">💳</div><h3>תשלום אנונימי</h3><p>אפשרות לתשלום ללא מפגש או זיהוי.</p></div>
+        <div class="feature"><div class="icon">⏰</div><h3>לפי שעה</h3><p>הזמנה גמישה לשעה, שעתיים או לילה שלם.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How -->
+  <section id="how" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>איך זה עובד?</h2>
+        <p>שלושה צעדים פשוטים לחוויה דיסקרטית.</p>
+      </div>
+      <div class="grid steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <h3>מתקשרים</h3>
+          <p>שיחה קצרה, ללא זיהוי, ואנחנו מבינים מה מתאים לך.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <h3>מקבלים קוד</h3>
+          <p>שולחים לך קוד כניסה ישירות לנייד — בלי מפגש.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <h3>נכנסים ונהנים</h3>
+          <p>צ'ק-אין עצמי, והכל שלך לשעה שהזמנת.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container">
+      <h2>מוכנים לחוויה דיסקרטית?</h2>
+      <p>שיחה אחת ואנחנו מסדרים לך חדר — בכל מקום בארץ.</p>
+      <a href="tel:031234567" class="btn btn-primary btn-large">📞 התקשר עכשיו</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="contact">
+    <div class="container footer-grid">
+      <div>
+        <a href="#" class="logo">Suite<span>Time</span></a>
+        <p>פלטפורמה להזמנת סוויטות וחדרים לפי שעה, בדיסקרטיות מלאה.</p>
+      </div>
+      <div>
+        <h4>ניווט</h4>
+        <ul>
+          <li><a href="#suites">סוויטות</a></li>
+          <li><a href="#how">איך זה עובד</a></li>
+          <li><a href="#features">יתרונות</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>צור קשר</h4>
+        <ul>
+          <li><a href="tel:031234567">📞 03-123-4567</a></li>
+          <li><a href="https://wa.me/97231234567">💬 וואטסאפ</a></li>
+          <li>✉️ info@suitetime.co.il</li>
+        </ul>
+      </div>
+      <div>
+        <h4>עקבו אחרינו</h4>
+        <div class="social">
+          <a href="#">📘</a><a href="#">📸</a><a href="#">🐦</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 SuiteTime. כל הזכויות שמורות. | <a href="#">מדיניות פרטיות</a> | <a href="#">תנאי שימוש</a></p>
+    </div>
+  </footer>
+
+  <script>
+    /* ---------- Theme engine ---------- */
+    const root = document.documentElement;
+    const swatches = document.querySelectorAll('.swatch');
+    const panel = document.getElementById('palettePanel');
+    const toggleBtn = document.getElementById('paletteToggle');
+    const THEMES = ['burgundy','midnight','ocean','forest','lavender','sunset'];
+
+    function applyTheme(name) {
+      root.setAttribute('data-theme', name);
+      localStorage.setItem('suiteTheme', name);
+      swatches.forEach(s => s.classList.toggle('active', s.dataset.theme === name));
+    }
+
+    swatches.forEach(sw => sw.addEventListener('click', () => applyTheme(sw.dataset.theme)));
+
+    (function () {
+      const saved = localStorage.getItem('suiteTheme');
+      applyTheme(THEMES.includes(saved) ? saved : 'burgundy');
+    })();
+
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      panel.classList.toggle('open');
+    });
+    document.addEventListener('click', (e) => {
+      if (!panel.contains(e.target) && e.target !== toggleBtn) panel.classList.remove('open');
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') panel.classList.remove('open');
+    });
+
+    /* ---------- Header scroll ---------- */
+    const header = document.getElementById('header');
+    function checkScroll() {
+      header.classList.toggle('scrolled', window.scrollY > 40);
+    }
+    window.addEventListener('scroll', checkScroll, { passive: true });
+    checkScroll();
+
+    /* ---------- Hero reveal ---------- */
+    const hero = document.querySelector('.hero');
+    window.addEventListener('load', () => hero.classList.add('loaded'));
+
+    /* ---------- Smooth scroll ---------- */
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (href === '#') return;
+        const target = document.querySelector(href);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

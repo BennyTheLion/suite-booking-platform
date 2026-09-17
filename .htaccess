@@ -1,0 +1,14 @@
+RewriteEngine On
+
+# Real files/dirs (admin/, superadmin/, assets/, uploads/) are served as-is — only unmatched paths fall through below.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# /{slug}/ -> index.php?site=slug
+RewriteRule ^([a-z0-9-]+)/?$ index.php?site=$1 [QSA,L]
+
+# /{slug}/room/{roomSlug} -> room.php?site=slug&room=roomSlug
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([a-z0-9-]+)/room/([a-z0-9-]+)/?$ room.php?site=$1&room=$2 [QSA,L]
+
+Options -Indexes
