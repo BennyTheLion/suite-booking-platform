@@ -2,3 +2,7 @@ config.php
 uploads/*
 !uploads/.gitkeep
 vendor/
+# Excluded so Hostinger's auto-deploy doesn't try (and fail) to run its own
+# composer update under the wrong CLI PHP version. Manage vendor/ manually over SSH instead
+# (see deployment notes) — composer.lock still lives locally for `composer install` there.
+composer.lock
