@@ -251,8 +251,9 @@ require __DIR__ . '/includes/header.php';
               ? "שלום, מעוניין/ת להזמין את {$room['name']} בתאריך {$selectedDate} בין {$startLabel} ל-{$endLabel}."
               : "שלום, מעוניין/ת להזמין את {$room['name']} מתאריך {$checkIn} עד {$checkOut}.";
           ?>
-          <a class="btn btn-outline" target="_blank" rel="noopener" href="<?= h(whatsapp_link($site['whatsapp'], $waMsg)) ?>" aria-label="<?= h(t($L, 'send_via_whatsapp')) ?>">
+          <a class="btn btn-outline" target="_blank" rel="noopener" href="<?= h(whatsapp_link($site['whatsapp'], $waMsg)) ?>">
             <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-3.2-6.4M20 12l-1-4-4 1"/></svg>
+            <span><?= h(t($L, 'book_via_whatsapp')) ?></span>
           </a>
           <?php endif; ?>
         </div>

@@ -34,9 +34,9 @@ require __DIR__ . '/includes/header.php';
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
     </div>
     <h1><?= h(t($L, 'request_sent_title')) ?></h1>
-    <p class="lead"><?= h(t($L, 'request_sent_body')) ?></p>
+    <p class="lead"><?= h(t($L, 'keep_page_open')) ?></p>
 
-    <div class="status-pill<?= $statusClass ?>"><span class="dot"></span><?= h($statusLabel) ?></div>
+    <div class="status-pill<?= $statusClass ?>" id="statusPill"><span class="dot"></span><span id="statusLabel"><?= h($statusLabel) ?></span></div>
 
     <div class="confirm-summary">
       <div class="confirm-row"><span><?= h(t($L, 'suite')) ?></span><strong><?= h($booking['room_name']) ?></strong></div>
@@ -55,5 +55,37 @@ require __DIR__ . '/includes/header.php';
     <p class="confirm-note"><?= h(t($L, 'request_number')) ?>: #<?= (int) $booking['id'] ?></p>
   </div>
 </div>
+
+<script>
+(function(){
+  var statusLabels = <?= json_encode([
+      'pending' => t($L, 'pending'),
+      'approved' => t($L, 'approved'),
+      'rejected' => t($L, 'rejected'),
+      'cancelled' => t($L, 'cancelled'),
+  ], JSON_UNESCAPED_UNICODE) ?>;
+  var pill = document.getElementById('statusPill');
+  var label = document.getElementById('statusLabel');
+  var lastStatus = <?= json_encode($booking['status']) ?>;
+  var statusUrl = '<?= APP_BASE_URL ?>/booking_status.php?site=<?= rawurlencode($site['slug']) ?>&id=<?= (int) $booking['id'] ?>';
+
+  function poll(){
+    fetch(statusUrl, {cache: 'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(data){
+        if (!data || !data.status || data.status === lastStatus) return;
+        lastStatus = data.status;
+        label.textContent = statusLabels[data.status] || data.status;
+        pill.classList.toggle('is-approved', data.status === 'approved');
+      })
+      .catch(function(){});
+  }
+
+  var interval = setInterval(poll, 10000);
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'visible') poll();
+  });
+})();
+</script>
 
 <?php require __DIR__ . '/includes/footer.php'; ?>

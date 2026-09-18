@@ -394,8 +394,9 @@ a{color:inherit;text-decoration:none;}
 .btn:active{transform:scale(0.97);}
 .btn-primary{background:linear-gradient(155deg,color-mix(in srgb, var(--accent) 80%, white 20%),var(--accent));color:var(--accent-ink);}
 .btn-primary:active{filter:brightness(0.94);}
-.btn-outline{flex:0 0 52px;background:var(--ok-tint);border:1px solid color-mix(in srgb, var(--ok) 30%, transparent);color:var(--ok);display:flex;align-items:center;justify-content:center;}
-.btn-outline svg{width:20px;height:20px;stroke:var(--ok);fill:none;}
+.btn-outline{flex:1;background:var(--ok-tint);border:1px solid color-mix(in srgb, var(--ok) 30%, transparent);color:var(--ok);display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;}
+.btn-outline svg{width:20px;height:20px;stroke:var(--ok);fill:none;flex-shrink:0;}
+.btn-outline span{white-space:nowrap;}
 
 /* ---------- confirmation ---------- */
 .confirm-wrap{padding-block:30px 10px;max-width:520px;margin-inline:auto;}
