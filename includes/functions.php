@@ -220,7 +220,13 @@ function get_room_schedule(int $roomId): array {
     return $out;
 }
 
+// Minutes of cleaning/reset time required immediately before and after every hourly booking.
+// New requests can't be made inside this window even though it's not part of the booking itself.
+const CLEANING_BUFFER_MIN = 30;
+
 // Returns booked/blocked time ranges (as [start,end] in minutes-from-midnight) for a room on a date.
+// Hourly bookings are padded by CLEANING_BUFFER_MIN on each side; a booking near midnight can spill
+// its buffer into the adjacent date, so neighboring days are checked for that too.
 function get_occupied_ranges(int $roomId, string $date): array {
     $ranges = [];
 
@@ -237,13 +243,42 @@ function get_occupied_ranges(int $roomId, string $date): array {
         if ($b['booking_type'] === 'daily') {
             $ranges[] = [0, 24 * 60]; // whole day blocked
         } elseif ($b['time_start'] && $b['time_end']) {
-            $ranges[] = [time_to_minutes($b['time_start']), time_to_minutes($b['time_end'])];
+            $ranges[] = [
+                max(0, time_to_minutes($b['time_start']) - CLEANING_BUFFER_MIN),
+                min(24 * 60, time_to_minutes($b['time_end']) + CLEANING_BUFFER_MIN),
+            ];
         }
     }
 
     $blocks = db_all('SELECT start_time, end_time FROM availability_blocks WHERE room_id = ? AND block_date = ?', [$roomId, $date]);
     foreach ($blocks as $b) {
         $ranges[] = [time_to_minutes($b['start_time']), time_to_minutes($b['end_time'])];
+    }
+
+    $prevDate = (new DateTime($date))->modify('-1 day')->format('Y-m-d');
+    $prevLate = db_all(
+        "SELECT time_end FROM bookings
+         WHERE room_id = ? AND booking_type = 'hourly' AND date_start = ?
+           AND (status = 'approved' OR (status = 'pending' AND created_at > NOW() - INTERVAL 15 MINUTE))
+           AND time_end > ?",
+        [$roomId, $prevDate, minutes_to_time(24 * 60 - CLEANING_BUFFER_MIN)]
+    );
+    foreach ($prevLate as $b) {
+        $spill = (time_to_minutes($b['time_end']) + CLEANING_BUFFER_MIN) - 24 * 60;
+        if ($spill > 0) $ranges[] = [0, $spill];
+    }
+
+    $nextDate = (new DateTime($date))->modify('+1 day')->format('Y-m-d');
+    $nextEarly = db_all(
+        "SELECT time_start FROM bookings
+         WHERE room_id = ? AND booking_type = 'hourly' AND date_start = ?
+           AND (status = 'approved' OR (status = 'pending' AND created_at > NOW() - INTERVAL 15 MINUTE))
+           AND time_start < ?",
+        [$roomId, $nextDate, minutes_to_time(CLEANING_BUFFER_MIN)]
+    );
+    foreach ($nextEarly as $b) {
+        $spill = CLEANING_BUFFER_MIN - time_to_minutes($b['time_start']);
+        if ($spill > 0) $ranges[] = [24 * 60 - $spill, 24 * 60];
     }
 
     return $ranges;

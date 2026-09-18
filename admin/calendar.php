@@ -350,7 +350,10 @@ for ($d = 1; $d <= $daysInMonth; $d++) {
         $occupied = [];
         foreach ($rows as $r) {
             if ($r['time_start'] && $r['time_end']) {
-                $occupied[] = [time_to_minutes($r['time_start']), time_to_minutes($r['time_end'])];
+                $occupied[] = [
+                    max(0, time_to_minutes($r['time_start']) - CLEANING_BUFFER_MIN),
+                    min(24 * 60, time_to_minutes($r['time_end']) + CLEANING_BUFFER_MIN),
+                ];
             }
         }
         foreach ($blocks as $b) {
