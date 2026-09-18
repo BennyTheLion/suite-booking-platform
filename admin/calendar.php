@@ -14,10 +14,13 @@ if (!$rooms) {
     exit;
 }
 
-$roomId = (int) ($_GET['room'] ?? $rooms[0]['id']);
-if (!in_array($roomId, array_column($rooms, 'id'), true)) $roomId = (int) $rooms[0]['id'];
-
 $view = ($_GET['view'] ?? 'month') === 'day' ? 'day' : 'month';
+
+$roomParam = $_GET['room'] ?? $rooms[0]['id'];
+$isAllRooms = $view === 'day' && $roomParam === 'all';
+$roomId = $isAllRooms ? 0 : (int) $roomParam;
+if (!$isAllRooms && !in_array($roomId, array_column($rooms, 'id'), true)) $roomId = (int) $rooms[0]['id'];
+
 $weekdayNames = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 $monthNames = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
 
@@ -46,15 +49,9 @@ function assign_columns(array $items): array {
     return $items;
 }
 
-if ($view === 'day') {
-    $dateParam = $_GET['date'] ?? date('Y-m-d');
-    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateParam) || !strtotime($dateParam)) $dateParam = date('Y-m-d');
-    $dateObj = new DateTime($dateParam);
-    $prevDate = (clone $dateObj)->modify('-1 day')->format('Y-m-d');
-    $nextDate = (clone $dateObj)->modify('+1 day')->format('Y-m-d');
-    $weekday = (int) $dateObj->format('w');
-    $dayLabel = $weekdayNames[$weekday] . ', ' . $dateObj->format('d.m.Y');
-
+// Builds one room's schedule/booking/block data for a given date, used by both the
+// single-room and all-rooms day views.
+function build_day_room_data(int $roomId, int $weekday, string $dateParam): array {
     $schedule = get_room_schedule($roomId);
     $daySchedule = $schedule[$weekday] ?? null;
     $isClosed = !$daySchedule || $daySchedule['is_closed'];
@@ -99,8 +96,118 @@ if ($view === 'day') {
     }
     $timedItems = $timedItems ? assign_columns($timedItems) : [];
 
+    return compact('daySchedule', 'isClosed', 'openMin', 'closeMin', 'fullDayBooking', 'timedItems');
+}
+
+if ($view === 'day') {
+    $dateParam = $_GET['date'] ?? date('Y-m-d');
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateParam) || !strtotime($dateParam)) $dateParam = date('Y-m-d');
+    $dateObj = new DateTime($dateParam);
+    $prevDate = (clone $dateObj)->modify('-1 day')->format('Y-m-d');
+    $nextDate = (clone $dateObj)->modify('+1 day')->format('Y-m-d');
+    $weekday = (int) $dateObj->format('w');
+    $dayLabel = $weekdayNames[$weekday] . ', ' . $dateObj->format('d.m.Y');
+
     $active = 'calendar';
     require __DIR__ . '/_layout_top.php';
+
+    if ($isAllRooms) {
+        $roomsData = [];
+        foreach ($rooms as $r) {
+            $roomsData[] = ['room' => $r] + build_day_room_data((int) $r['id'], $weekday, $dateParam);
+        }
+        ?>
+        <div class="a-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <a class="a-btn secondary small" href="?site=<?= h($slug) ?>&room=all&month=<?= h($dateObj->format('Y-m')) ?>">‹ ללוח חודשי</a>
+              <a class="a-btn secondary small" href="?site=<?= h($slug) ?>&room=all&view=day&date=<?= h($prevDate) ?>">‹ יום קודם</a>
+              <strong style="font-size:15px;"><?= h($dayLabel) ?></strong>
+              <a class="a-btn secondary small" href="?site=<?= h($slug) ?>&room=all&view=day&date=<?= h($nextDate) ?>">יום הבא ›</a>
+            </div>
+            <form method="get" style="display:flex;align-items:center;gap:8px;">
+              <input type="hidden" name="site" value="<?= h($slug) ?>">
+              <input type="hidden" name="view" value="day">
+              <input type="hidden" name="date" value="<?= h($dateParam) ?>">
+              <select name="room" onchange="this.form.submit()">
+                <option value="all" selected>כל החדרים</option>
+                <?php foreach ($rooms as $r): ?>
+                  <option value="<?= (int) $r['id'] ?>"><?= h($r['name']) ?></option>
+                <?php endforeach; ?>
+              </select>
+            </form>
+          </div>
+
+          <div class="cal-legend">
+            <span><i class="cal-dot full"></i> תפוס</span>
+            <span><i class="cal-dot partial"></i> ממתין לאישור</span>
+            <span><i class="cal-dot closed"></i> חסום ידנית</span>
+          </div>
+
+          <div class="day-timeline-wrap">
+            <div style="display:flex;">
+              <div class="day-hour-gutter" style="height:calc(24 * var(--hour-h));">
+                <?php for ($h = 0; $h <= 24; $h++): ?>
+                  <span class="day-hour-label" dir="ltr" style="top:calc(<?= $h ?> * var(--hour-h));"><?= sprintf('%02d:00', $h) ?></span>
+                <?php endfor; ?>
+              </div>
+              <div class="day-multi-cols">
+                <?php foreach ($roomsData as $rd): ?>
+                  <div class="day-multi-col">
+                    <div class="day-multi-colname"><?= h($rd['room']['name']) ?></div>
+                    <div class="day-multi-colbody" style="height:calc(24 * var(--hour-h));">
+                      <?php if ($rd['isClosed']): ?>
+                        <div class="day-shade" style="top:0;height:100%;"></div>
+                        <div class="day-multi-closed-label">סגור</div>
+                      <?php else: ?>
+                        <?php if ($rd['openMin'] > 0): ?>
+                          <div class="day-shade" style="top:0;height:calc(<?= $rd['openMin'] ?> / 60 * var(--hour-h));"></div>
+                        <?php endif; ?>
+                        <?php if ($rd['closeMin'] < 1440): ?>
+                          <div class="day-shade" style="top:calc(<?= $rd['closeMin'] ?> / 60 * var(--hour-h));height:calc((1440 - <?= $rd['closeMin'] ?>) / 60 * var(--hour-h));"></div>
+                        <?php endif; ?>
+                        <?php if ($rd['fullDayBooking']): $fb = $rd['fullDayBooking']; ?>
+                          <div class="day-item <?= $fb['status'] === 'pending' ? 'is-pending' : 'is-approved' ?>" style="top:0;height:100%;inset-inline-start:2px;width:calc(100% - 4px);">
+                            <strong>יום מלא</strong>
+                            <span><?= h($fb['guest_name']) ?> · <?= h($fb['guest_phone']) ?></span>
+                          </div>
+                        <?php endif; ?>
+                        <?php foreach ($rd['timedItems'] as $it):
+                          $widthPct = 100 / $it['totalCols'];
+                          $leftPct = $it['col'] * $widthPct;
+                          $durMin = max(15, $it['end'] - $it['start']);
+                          $cls = $it['block'] ? 'is-block' : ($it['pending'] ? 'is-pending' : 'is-approved');
+                        ?>
+                          <div class="day-item <?= $cls ?>" style="
+                            top:calc(<?= $it['start'] ?> / 60 * var(--hour-h));
+                            height:calc(<?= $durMin ?> / 60 * var(--hour-h));
+                            inset-inline-start:calc(<?= $leftPct ?>% + 2px);
+                            width:calc(<?= $widthPct ?>% - 4px);
+                          ">
+                            <strong dir="ltr"><?= sprintf('%02d:%02d', intdiv($it['start'], 60), $it['start'] % 60) ?>–<?= sprintf('%02d:%02d', intdiv($it['end'], 60), $it['end'] % 60) ?></strong>
+                            <span><?= h($it['label']) ?></span>
+                          </div>
+                        <?php endforeach; ?>
+                      <?php endif; ?>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            </div>
+          </div>
+        </div>
+        <?php
+        require __DIR__ . '/_layout_bottom.php';
+        exit;
+    }
+
+    $rd = build_day_room_data($roomId, $weekday, $dateParam);
+    $daySchedule = $rd['daySchedule'];
+    $isClosed = $rd['isClosed'];
+    $openMin = $rd['openMin'];
+    $closeMin = $rd['closeMin'];
+    $fullDayBooking = $rd['fullDayBooking'];
+    $timedItems = $rd['timedItems'];
     ?>
 
     <div class="a-card">
@@ -116,6 +223,7 @@ if ($view === 'day') {
           <input type="hidden" name="view" value="day">
           <input type="hidden" name="date" value="<?= h($dateParam) ?>">
           <select name="room" onchange="this.form.submit()">
+            <?php if (count($rooms) > 1): ?><option value="all">כל החדרים</option><?php endif; ?>
             <?php foreach ($rooms as $r): ?>
               <option value="<?= (int) $r['id'] ?>" <?= (int) $r['id'] === $roomId ? 'selected' : '' ?>><?= h($r['name']) ?></option>
             <?php endforeach; ?>
@@ -278,15 +386,20 @@ require __DIR__ . '/_layout_top.php';
       <strong style="font-size:15px;"><?= h($monthLabel) ?></strong>
       <a class="a-btn secondary small" href="?site=<?= h($slug) ?>&room=<?= $roomId ?>&month=<?= h($nextMonth) ?>">הבא ›</a>
     </div>
-    <form method="get" style="display:flex;align-items:center;gap:8px;">
-      <input type="hidden" name="site" value="<?= h($slug) ?>">
-      <input type="hidden" name="month" value="<?= h($monthParam) ?>">
-      <select name="room" onchange="this.form.submit()">
-        <?php foreach ($rooms as $r): ?>
-          <option value="<?= (int) $r['id'] ?>" <?= (int) $r['id'] === $roomId ? 'selected' : '' ?>><?= h($r['name']) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </form>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <?php if (count($rooms) > 1): ?>
+        <a class="a-btn secondary small" href="?site=<?= h($slug) ?>&room=all&view=day&date=<?= h($today) ?>">כל החדרים היום ›</a>
+      <?php endif; ?>
+      <form method="get" style="display:flex;align-items:center;gap:8px;">
+        <input type="hidden" name="site" value="<?= h($slug) ?>">
+        <input type="hidden" name="month" value="<?= h($monthParam) ?>">
+        <select name="room" onchange="this.form.submit()">
+          <?php foreach ($rooms as $r): ?>
+            <option value="<?= (int) $r['id'] ?>" <?= (int) $r['id'] === $roomId ? 'selected' : '' ?>><?= h($r['name']) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </form>
+    </div>
   </div>
 
   <div class="cal-legend">
