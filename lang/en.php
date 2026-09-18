@@ -111,7 +111,6 @@ return [
     'night_singular' => 'night',
     'night_plural' => 'nights',
     'hero_cta_primary' => 'View Rooms',
-    'scroll_down' => 'Scroll',
     'rooms_subtitle' => 'A selection of rooms with everything you need for a perfect stay.',
     'features_title' => 'Why choose us?',
     'features_subtitle' => 'The small details that make the difference.',

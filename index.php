@@ -72,7 +72,6 @@ require __DIR__ . '/includes/header.php';
       </div>
     </div>
 
-    <a href="#rooms" class="scroll-cue"><?= h(t($L, 'scroll_down')) ?></a>
   </div>
 
   <div class="container" id="rooms">

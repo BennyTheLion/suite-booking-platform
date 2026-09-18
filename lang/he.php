@@ -111,7 +111,6 @@ return [
     'night_singular' => 'לילה',
     'night_plural' => 'לילות',
     'hero_cta_primary' => 'לצפייה בחדרים',
-    'scroll_down' => 'גלול',
     'rooms_subtitle' => 'מבחר חדרים עם כל מה שצריך לחוויה מושלמת.',
     'features_title' => 'למה לבחור בנו?',
     'features_subtitle' => 'הפרטים הקטנים שעושים את ההבדל.',

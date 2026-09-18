@@ -218,11 +218,7 @@ a{color:inherit;text-decoration:none;}
 .hero-full.is-revealed .hero-reveal-body .hero-cta-row,
 .hero-full.is-revealed .hero-reveal-body .hero-pills{opacity:1;transform:none;}
 
-.scroll-cue{position:absolute;bottom:20px;inset-inline-start:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,.75);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;animation:heroBob 2.4s ease-in-out infinite;z-index:2;}
-.scroll-cue::after{content:'';width:1px;height:26px;background:linear-gradient(180deg, rgba(255,255,255,.7), transparent);}
-
 @keyframes heroDrift{from{transform:scale(1);}to{transform:scale(1.09);}}
-@keyframes heroBob{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(6px);}}
 
 .suites-heading{margin:0 0 16px;}
 .suites-heading h2{font-family:var(--font-display);font-weight:500;font-size:24px;margin:0 0 6px;color:var(--ink);}
@@ -440,7 +436,6 @@ a{color:inherit;text-decoration:none;}
   .gallery-main .scene{transition:opacity 1ms linear;}
   .hero-media{animation:none;}
   .hero-reveal-body h1,.hero-reveal-body .sub,.hero-reveal-body .hero-cta-row,.hero-reveal-body .hero-pills{transform:none;transition-duration:150ms;}
-  .scroll-cue{animation:none;}
 }
 
 /* ---------- floating action buttons ---------- */
