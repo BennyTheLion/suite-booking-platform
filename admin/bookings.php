@@ -7,7 +7,56 @@ $site = require_admin($slug);
 
 $flash = '';
 $flashType = 'ok';
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'manual_create') {
+    csrf_verify();
+    $roomId = (int) ($_POST['room_id'] ?? 0);
+    $room = get_room($roomId, (int) $site['id']);
+    $guestName = trim((string) ($_POST['guest_name'] ?? ''));
+    $guestPhone = trim((string) ($_POST['guest_phone'] ?? ''));
+    $notes = trim((string) ($_POST['notes'] ?? ''));
+    $bookingType = ($_POST['booking_type'] ?? 'hourly') === 'daily' ? 'daily' : 'hourly';
+
+    if (!$room || $guestName === '' || $guestPhone === '') {
+        $flash = 'נא למלא חדר, שם וטלפון.';
+        $flashType = 'error';
+    } elseif ($bookingType === 'hourly') {
+        $date = $_POST['date'] ?? '';
+        $start = $_POST['start'] ?? '';
+        $end = $_POST['end'] ?? '';
+        if (!$date || !$start || !$end || $start >= $end) {
+            $flash = 'נא למלא תאריך ושעות תקינות.';
+            $flashType = 'error';
+        } elseif (!is_range_free($roomId, $date, $start . ':00', $end . ':00')) {
+            $flash = 'המועד תפוס — לא ניתן להוסיף הזמנה חופפת.';
+            $flashType = 'error';
+        } else {
+            db_run(
+                'INSERT INTO bookings (site_id, room_id, guest_name, guest_phone, booking_type, date_start, date_end, time_start, time_end, status, notes)
+                 VALUES (?, ?, ?, ?, "hourly", ?, ?, ?, ?, "approved", ?)',
+                [(int) $site['id'], $roomId, $guestName, $guestPhone, $date, $date, $start . ':00', $end . ':00', $notes]
+            );
+            $flash = 'ההזמנה נוספה ואושרה.';
+        }
+    } else {
+        $checkIn = $_POST['checkin'] ?? '';
+        $checkOut = $_POST['checkout'] ?? '';
+        if (!$checkIn || !$checkOut || $checkOut <= $checkIn) {
+            $flash = 'נא למלא תאריכי הגעה ועזיבה תקינים.';
+            $flashType = 'error';
+        } elseif (!is_daily_range_free($roomId, $checkIn, $checkOut)) {
+            $flash = 'המועד תפוס — לא ניתן להוסיף הזמנה חופפת.';
+            $flashType = 'error';
+        } else {
+            $lastNight = (new DateTime($checkOut))->modify('-1 day')->format('Y-m-d');
+            db_run(
+                'INSERT INTO bookings (site_id, room_id, guest_name, guest_phone, booking_type, date_start, date_end, time_start, time_end, status, notes)
+                 VALUES (?, ?, ?, ?, "daily", ?, ?, NULL, NULL, "approved", ?)',
+                [(int) $site['id'], $roomId, $guestName, $guestPhone, $checkIn, $lastNight, $notes]
+            );
+            $flash = 'ההזמנה נוספה ואושרה.';
+        }
+    }
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
     $bookingId = (int) ($_POST['booking_id'] ?? 0);
     $action = $_POST['action'] ?? '';
@@ -56,6 +105,73 @@ require __DIR__ . '/_layout_top.php';
 ?>
 
 <?php if ($flash): ?><div class="a-alert <?= h($flashType) ?>"><?= h($flash) ?></div><?php endif; ?>
+
+<div class="a-card">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+    <h2 style="margin:0;">הוספת הזמנה ידנית</h2>
+    <button class="a-btn secondary small" type="button" id="manualBookingToggle">הזמנה שהתקבלה בוואטסאפ / טלפון</button>
+  </div>
+  <p style="color:var(--a-faint);font-size:13px;margin:6px 0 0;">שימוש: כשמתאמים הזמנה מחוץ למערכת (וואטסאפ, טלפון), הוסיפו אותה כאן כדי לחסום את התאריך בלוח הזמינות.</p>
+
+  <form method="post" id="manualBookingForm" style="margin-top:14px;display:none;">
+    <?= csrf_field() ?>
+    <input type="hidden" name="action" value="manual_create">
+
+    <div class="a-field-row">
+      <div style="flex:1;"><label>חדר</label>
+        <select name="room_id" required>
+          <?php foreach ($rooms as $r): ?><option value="<?= (int) $r['id'] ?>"><?= h($r['name']) ?></option><?php endforeach; ?>
+        </select>
+      </div>
+      <div style="flex:1;"><label>סוג הזמנה</label>
+        <select name="booking_type" id="manualBookingType">
+          <option value="hourly">שעתי</option>
+          <option value="daily">יום מלא</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="a-field-row" id="manualHourlyFields">
+      <div style="flex:1;"><label>תאריך</label><input type="date" name="date"></div>
+      <div style="flex:1;"><label>משעה</label><input type="time" name="start"></div>
+      <div style="flex:1;"><label>עד שעה</label><input type="time" name="end"></div>
+    </div>
+
+    <div class="a-field-row" id="manualDailyFields" style="display:none;">
+      <div style="flex:1;"><label>הגעה</label><input type="date" name="checkin"></div>
+      <div style="flex:1;"><label>עזיבה</label><input type="date" name="checkout"></div>
+    </div>
+
+    <div class="a-field-row">
+      <div style="flex:1;"><label>שם האורח</label><input type="text" name="guest_name" required></div>
+      <div style="flex:1;"><label>טלפון</label><input type="tel" name="guest_phone" required></div>
+    </div>
+
+    <div class="a-field-row">
+      <div style="flex:1;"><label>הערה (אופציונלי)</label><input type="text" name="notes" placeholder="לדוגמה: תואם בוואטסאפ"></div>
+    </div>
+
+    <button class="a-btn" type="submit">הוספה ואישור</button>
+  </form>
+</div>
+
+<script>
+(function(){
+  var toggle = document.getElementById('manualBookingToggle');
+  var form = document.getElementById('manualBookingForm');
+  var typeSel = document.getElementById('manualBookingType');
+  var hourlyFields = document.getElementById('manualHourlyFields');
+  var dailyFields = document.getElementById('manualDailyFields');
+  toggle.addEventListener('click', function(){
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  });
+  typeSel.addEventListener('change', function(){
+    var isDaily = typeSel.value === 'daily';
+    hourlyFields.style.display = isDaily ? 'none' : 'flex';
+    dailyFields.style.display = isDaily ? 'flex' : 'none';
+  });
+})();
+</script>
 
 <div class="a-card">
   <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">

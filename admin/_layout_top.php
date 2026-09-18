@@ -27,6 +27,7 @@ $pendingCount = $pendingCount ?? count_unread_notifications((int) $site['id']);
       <a href="index.php?site=<?= h($slug) ?>" class="<?= ($active ?? '') === 'dashboard' ? 'is-active' : '' ?>">לוח בקרה<?php if ($pendingCount): ?><span class="a-badge"><?= $pendingCount ?></span><?php endif; ?></a>
       <a href="rooms.php?site=<?= h($slug) ?>" class="<?= ($active ?? '') === 'rooms' ? 'is-active' : '' ?>">חדרים</a>
       <a href="bookings.php?site=<?= h($slug) ?>" class="<?= ($active ?? '') === 'bookings' ? 'is-active' : '' ?>">הזמנות</a>
+      <a href="calendar.php?site=<?= h($slug) ?>" class="<?= ($active ?? '') === 'calendar' ? 'is-active' : '' ?>">יומן</a>
       <a href="settings.php?site=<?= h($slug) ?>" class="<?= ($active ?? '') === 'settings' ? 'is-active' : '' ?>">הגדרות</a>
       <a href="<?= APP_BASE_URL . '/' . h($slug) . '/' ?>" target="_blank">צפייה באתר ↗</a>
     </nav>

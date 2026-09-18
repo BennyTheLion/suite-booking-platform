@@ -86,3 +86,37 @@ th{color:var(--a-faint);font-weight:600;font-size:11.5px;text-transform:uppercas
 
 .a-weekday-row{display:grid;grid-template-columns:90px 1fr 100px 100px;gap:8px;align-items:center;margin-bottom:6px;font-size:13px;}
 @media (max-width:600px){ .a-weekday-row{grid-template-columns:70px 1fr 1fr;} .a-weekday-row .a-closed-label{grid-column:1/-1;} }
+
+.cal-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;font-size:12px;color:var(--a-dim);}
+.cal-legend span{display:inline-flex;align-items:center;gap:5px;}
+.cal-dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+.cal-dot.free{background:var(--a-ok);}
+.cal-dot.partial{background:var(--a-warn);}
+.cal-dot.full{background:var(--a-danger);}
+.cal-dot.closed{background:var(--a-faint);}
+
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cal-weekdays{margin-bottom:6px;}
+.cal-weekdays div{text-align:center;font-size:11.5px;color:var(--a-faint);font-weight:700;}
+.cal-cell{
+  min-height:78px;border-radius:8px;border:1px solid var(--a-line);padding:6px;background:var(--a-surface);
+  display:flex;flex-direction:column;gap:3px;overflow:hidden;
+}
+.cal-cell.is-blank{border:none;background:transparent;}
+.cal-cell.status-free{background:var(--a-ok-tint);border-color:color-mix(in srgb, var(--a-ok) 25%, transparent);}
+.cal-cell.status-partial{background:var(--a-warn-tint);border-color:color-mix(in srgb, var(--a-warn) 30%, transparent);}
+.cal-cell.status-full{background:var(--a-danger-tint);border-color:color-mix(in srgb, var(--a-danger) 30%, transparent);}
+.cal-cell.status-closed{background:#f1f2f4;color:var(--a-faint);}
+.cal-cell.is-today{outline:2px solid var(--a-accent);outline-offset:-2px;}
+.cal-daynum{font-size:12px;font-weight:700;}
+.cal-item{font-size:10px;line-height:1.3;background:rgba(255,255,255,.6);border-radius:4px;padding:1px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cal-item.is-pending{opacity:.75;font-style:italic;}
+.cal-item.is-block{background:rgba(0,0,0,.08);}
+.cal-item.cal-more{background:transparent;color:var(--a-dim);font-weight:700;}
+
+@media (max-width:700px){
+  .cal-grid{gap:3px;}
+  .cal-cell{min-height:56px;padding:4px;}
+  .cal-item{display:none;}
+  .cal-daynum{font-size:11px;}
+}
