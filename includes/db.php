@@ -1,5 +1,19 @@
 <?php
-require_once __DIR__ . '/../config.php';
+// Looks in the project root first (local dev), then one directory above it —
+// e.g. Hostinger's public_html sibling — so config.php can be kept outside the web root in production.
+$configCandidates = [__DIR__ . '/../config.php', __DIR__ . '/../../config.php'];
+$configFound = false;
+foreach ($configCandidates as $configPath) {
+    if (is_file($configPath)) {
+        require_once $configPath;
+        $configFound = true;
+        break;
+    }
+}
+if (!$configFound) {
+    throw new RuntimeException('config.php not found. Copy config.example.php to config.php, either in the project root or one directory above it, and fill in your values.');
+}
+unset($configCandidates, $configFound, $configPath);
 
 function db(): mysqli {
     static $conn = null;
