@@ -133,4 +133,5 @@ return [
     'accessibility_statement' => 'Accessibility Statement',
     'nav_google_maps' => 'Navigate with Google Maps',
     'nav_waze' => 'Navigate with Waze',
+    'hero_hover_hint' => 'Hover / tap for details',
 ];

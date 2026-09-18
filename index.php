@@ -31,36 +31,44 @@ require __DIR__ . '/includes/header.php';
   <div class="hero-full">
     <div class="hero-media<?= $site['hero_image'] ? ' has-image' : '' ?>"<?php if ($site['hero_image']): ?> style="--hero-img:url('<?= APP_BASE_URL . '/' . h($site['hero_image']) ?>');--hero-pos:<?= h($site['hero_position'] ?: 'center') ?>"<?php endif; ?>></div>
     <div class="hero-scrim"></div>
-    <div class="hero-copy container">
-      <p class="kicker"><?= h($site['tagline']) ?></p>
-      <h1><?= h($site['name']) ?></h1>
-      <?php if (!empty($site['address'])): ?>
-        <p class="sub"><?= h($site['address']) ?></p>
-      <?php endif; ?>
-
-      <div class="hero-cta-row">
-        <a href="#rooms" class="pill-btn pill-btn-primary"><?= h(t($L, 'hero_cta_primary')) ?></a>
-        <?php if ($site['phone']): ?>
-        <a href="tel:<?= h(preg_replace('/\s+/', '', $site['phone'])) ?>" class="pill-btn pill-btn-ghost">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          <?= h($site['phone']) ?>
-        </a>
+    <div class="hero-copy container" id="heroReveal">
+      <div class="hero-reveal-hint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 9V5.5a1.5 1.5 0 0 1 3 0V9m0 0V4.5a1.5 1.5 0 0 1 3 0V9m0 0V6.5a1.5 1.5 0 0 1 3 0V12c0 4-2 7-5.5 7S6 16 5 14l-1.5-3c-.4-.9 0-2 1-2.3.8-.3 1.7 0 2.2.7L9 12"/></svg>
+        <span><?= h(t($L, 'hero_hover_hint')) ?></span>
+      </div>
+      <div class="hero-reveal-body">
+        <h1><?= h($site['name']) ?></h1>
+        <?php if ($site['tagline']): ?>
+          <p class="sub"><?= h($site['tagline']) ?></p>
         <?php endif; ?>
-        <?php if ($site['whatsapp']): ?>
-        <a href="<?= h(whatsapp_link($site['whatsapp'], 'שלום, אשמח לפרטים נוספים על ' . $site['name'] . '.')) ?>" target="_blank" rel="noopener" class="pill-btn pill-btn-ghost">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 12a8 8 0 1 1-3.2-6.4M20 12l-1-4-4 1"/></svg>
-          וואטסאפ
-        </a>
+        <?php if (!empty($site['address'])): ?>
+          <p class="sub"><?= h($site['address']) ?></p>
+        <?php endif; ?>
+
+        <div class="hero-cta-row">
+          <a href="#rooms" class="pill-btn pill-btn-primary"><?= h(t($L, 'hero_cta_primary')) ?></a>
+          <?php if ($site['phone']): ?>
+          <a href="tel:<?= h(preg_replace('/\s+/', '', $site['phone'])) ?>" class="pill-btn pill-btn-ghost">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <?= h($site['phone']) ?>
+          </a>
+          <?php endif; ?>
+          <?php if ($site['whatsapp']): ?>
+          <a href="<?= h(whatsapp_link($site['whatsapp'], 'שלום, אשמח לפרטים נוספים על ' . $site['name'] . '.')) ?>" target="_blank" rel="noopener" class="pill-btn pill-btn-ghost">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 12a8 8 0 1 1-3.2-6.4M20 12l-1-4-4 1"/></svg>
+            וואטסאפ
+          </a>
+          <?php endif; ?>
+        </div>
+
+        <?php if ($trustItems): ?>
+        <div class="hero-pills">
+          <?php foreach ($trustItems as $item): ?>
+          <span class="hero-pill"><span class="check">✓</span> <?= h($item['title']) ?></span>
+          <?php endforeach; ?>
+        </div>
         <?php endif; ?>
       </div>
-
-      <?php if ($trustItems): ?>
-      <div class="hero-pills">
-        <?php foreach ($trustItems as $item): ?>
-        <span class="hero-pill"><span class="check">✓</span> <?= h($item['title']) ?></span>
-        <?php endforeach; ?>
-      </div>
-      <?php endif; ?>
     </div>
 
     <a href="#rooms" class="scroll-cue"><?= h(t($L, 'scroll_down')) ?></a>
@@ -160,7 +168,10 @@ require __DIR__ . '/includes/header.php';
 
   <div class="container">
     <?php if (!empty($site['address']) || !empty($site['location_lat'])): ?>
-    <div class="section-label"><?= h(t($L, 'address')) ?></div>
+    <div class="section-label">
+      <?= h(t($L, 'address')) ?>
+      <?php if (!empty($site['address'])): ?><span class="section-label-value"><?= h($site['address']) ?></span><?php endif; ?>
+    </div>
     <div class="location">
       <div class="map-box">
         <?php if ($site['location_lat'] && $site['location_lng']): ?>
@@ -169,7 +180,6 @@ require __DIR__ . '/includes/header.php';
           <div class="pin"></div>
         <?php endif; ?>
       </div>
-      <p class="location-text"><strong><?= h($site['address']) ?></strong> <?= $site['location_text'] ? '— ' . h($site['location_text']) : '' ?></p>
       <?php
         $hasLatLng = $site['location_lat'] && $site['location_lng'];
         $dest = $hasLatLng ? $site['location_lat'] . ',' . $site['location_lng'] : (string) $site['address'];
@@ -179,16 +189,19 @@ require __DIR__ . '/includes/header.php';
           : 'https://waze.com/ul?q=' . rawurlencode($dest) . '&navigate=yes';
       ?>
       <?php if ($dest !== ''): ?>
-      <div class="nav-links">
-        <a href="<?= h($googleUrl) ?>" target="_blank" rel="noopener" class="pill-btn pill-btn-outline nav-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-7.2 7-12a7 7 0 1 0-14 0c0 4.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      <div class="cta-band-actions nav-links">
+        <a href="<?= h($googleUrl) ?>" target="_blank" rel="noopener" class="pill-btn pill-btn-primary">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C7.6 2 4 5.6 4 10c0 5.4 7 11.5 7.3 11.8.2.1.4.2.7.2s.5-.1.7-.2C12.9 21.5 20 15.4 20 10c0-4.4-3.6-8-8-8Z"/><circle cx="12" cy="10" r="3" fill="var(--accent)"/></svg>
           <?= h(t($L, 'nav_google_maps')) ?>
         </a>
-        <a href="<?= h($wazeUrl) ?>" target="_blank" rel="noopener" class="pill-btn pill-btn-outline nav-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1" fill="currentColor" stroke="none"/><path d="M8 15c1 1 2.5 1.5 4 1.5s3-.5 4-1.5"/></svg>
+        <a href="<?= h($wazeUrl) ?>" target="_blank" rel="noopener" class="pill-btn pill-btn-outline">
+          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1.3" fill="var(--ground)"/><circle cx="15" cy="10" r="1.3" fill="var(--ground)"/><path d="M8 15c1 1 2.5 1.5 4 1.5s3-.5 4-1.5" stroke="var(--ground)" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
           <?= h(t($L, 'nav_waze')) ?>
         </a>
       </div>
+      <?php endif; ?>
+      <?php if ($site['location_text']): ?>
+      <p class="location-text"><?= h($site['location_text']) ?></p>
       <?php endif; ?>
     </div>
     <?php endif; ?>
@@ -209,7 +222,6 @@ require __DIR__ . '/includes/header.php';
             </div>
             <span><?= h($site['name']) ?></span>
           </div>
-          <?php if ($site['tagline']): ?><p class="footer-tagline"><?= h($site['tagline']) ?></p><?php endif; ?>
         </div>
 
         <div class="footer-col">
@@ -264,6 +276,18 @@ require __DIR__ . '/includes/header.php';
   var onScroll = function () { header.classList.toggle('is-scrolled', window.scrollY > 40); };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
+})();
+
+(function () {
+  var heroFull = document.querySelector('.hero-full');
+  var revealBody = document.getElementById('heroReveal');
+  if (!heroFull || !revealBody || (window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches)) return;
+  heroFull.addEventListener('click', function (e) {
+    if (!heroFull.classList.contains('is-revealed')) {
+      if (e.target.closest('a')) e.preventDefault();
+      heroFull.classList.add('is-revealed');
+    }
+  });
 })();
 </script>
 

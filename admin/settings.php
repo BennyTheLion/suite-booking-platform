@@ -155,10 +155,8 @@ require __DIR__ . '/_layout_top.php';
   <h2>פרטי העסק</h2>
   <form method="post">
     <?= csrf_field() ?><input type="hidden" name="action" value="update_info">
-    <div class="a-field-row">
-      <div><label>שם העסק</label><input type="text" name="name" value="<?= h($site['name']) ?>" required></div>
-      <div><label>תיאור קצר (Tagline)</label><input type="text" name="tagline" value="<?= h($site['tagline']) ?>"></div>
-    </div>
+    <div><label>שם העסק</label><input type="text" name="name" value="<?= h($site['name']) ?>" required></div>
+    <div><label>תיאור קצר (Tagline)</label><input type="text" name="tagline" value="<?= h($site['tagline']) ?>"></div>
     <div class="a-field-row">
       <div><label>טלפון</label><input type="tel" name="phone" value="<?= h($site['phone']) ?>"></div>
       <div><label>וואטסאפ (למשל 972501234567)</label><input type="tel" name="whatsapp" value="<?= h($site['whatsapp']) ?>"></div>

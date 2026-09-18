@@ -29,7 +29,7 @@ $headerClass = 'site-header' . (!empty($headerOverlay) ? ' site-header--overlay'
               <?= h(mb_substr($site['name'], 0, 1)) ?>
             <?php endif; ?>
           </div>
-          <div class="brand-name"><?= h($site['name']) ?><small><?= h($site['tagline']) ?></small></div>
+          <div class="brand-name"><?= h($site['name']) ?></div>
         </a>
         <div class="topbar-actions">
           <details class="legal-menu">

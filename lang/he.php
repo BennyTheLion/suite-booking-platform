@@ -133,4 +133,5 @@ return [
     'accessibility_statement' => 'הצהרת נגישות',
     'nav_google_maps' => 'ניווט בגוגל מפות',
     'nav_waze' => 'ניווט בוויז',
+    'hero_hover_hint' => 'העבירו עכבר / הקישו לפרטים',
 ];
