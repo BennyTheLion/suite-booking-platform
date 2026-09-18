@@ -64,7 +64,7 @@ if ($view === 'day') {
     $rows = db_all(
         "SELECT guest_name, guest_phone, booking_type, time_start, time_end, status FROM bookings
          WHERE room_id = ?
-           AND (status = 'approved' OR (status = 'pending' AND created_at > NOW() - INTERVAL 15 MINUTE))
+           AND status IN ('approved', 'pending')
            AND ? BETWEEN date_start AND date_end
          ORDER BY time_start",
         [$roomId, $dateParam]
@@ -205,7 +205,7 @@ for ($d = 1; $d <= $daysInMonth; $d++) {
     $rows = db_all(
         "SELECT guest_name, booking_type, time_start, time_end, status FROM bookings
          WHERE room_id = ?
-           AND (status = 'approved' OR (status = 'pending' AND created_at > NOW() - INTERVAL 15 MINUTE))
+           AND status IN ('approved', 'pending')
            AND ? BETWEEN date_start AND date_end
          ORDER BY time_start",
         [$roomId, $dateStr]
@@ -234,13 +234,31 @@ for ($d = 1; $d <= $daysInMonth; $d++) {
     if ($isFullDay) {
         $status = 'full';
     } else {
-        $slots = get_hourly_slots($roomId, $dateStr, 30);
-        if (!$slots) {
-            $status = 'closed';
-        } else {
-            $freeCount = count(array_filter($slots, fn($s) => $s['available']));
-            $status = $freeCount === 0 ? 'full' : ($freeCount === count($slots) ? 'free' : 'partial');
+        // Computed from the same rows/blocks as the item list above (any pending age counts),
+        // not get_hourly_slots()/get_occupied_ranges() which only count pending < 15 min old —
+        // that shorter window is meant for guest-facing availability, not admin visibility.
+        $openMinCell = time_to_minutes($daySchedule['open_time']);
+        $closeMinCell = time_to_minutes($daySchedule['close_time']);
+        $occupied = [];
+        foreach ($rows as $r) {
+            if ($r['time_start'] && $r['time_end']) {
+                $occupied[] = [time_to_minutes($r['time_start']), time_to_minutes($r['time_end'])];
+            }
         }
+        foreach ($blocks as $b) {
+            $occupied[] = [time_to_minutes($b['time_start']), time_to_minutes($b['time_end'])];
+        }
+        $totalSlots = 0;
+        $freeCount = 0;
+        for ($t = $openMinCell; $t < $closeMinCell; $t += 30) {
+            $totalSlots++;
+            $isFree = true;
+            foreach ($occupied as [$os, $oe]) {
+                if ($t < $oe && ($t + 30) > $os) { $isFree = false; break; }
+            }
+            if ($isFree) $freeCount++;
+        }
+        $status = $totalSlots === 0 ? 'closed' : ($freeCount === 0 ? 'full' : ($freeCount === $totalSlots ? 'free' : 'partial'));
     }
 
     $days[$d] = ['status' => $status, 'items' => $items];
