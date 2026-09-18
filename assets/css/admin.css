@@ -100,8 +100,10 @@ th{color:var(--a-faint);font-weight:600;font-size:11.5px;text-transform:uppercas
 .cal-weekdays div{text-align:center;font-size:11.5px;color:var(--a-faint);font-weight:700;}
 .cal-cell{
   min-height:78px;border-radius:8px;border:1px solid var(--a-line);padding:6px;background:var(--a-surface);
-  display:flex;flex-direction:column;gap:3px;overflow:hidden;
+  display:flex;flex-direction:column;gap:3px;overflow:hidden;text-decoration:none;color:inherit;cursor:pointer;
+  transition:transform 120ms ease;
 }
+.cal-cell:not(.is-blank):hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.08);}
 .cal-cell.is-blank{border:none;background:transparent;}
 .cal-cell.status-free{background:var(--a-ok-tint);border-color:color-mix(in srgb, var(--a-ok) 25%, transparent);}
 .cal-cell.status-partial{background:var(--a-warn-tint);border-color:color-mix(in srgb, var(--a-warn) 30%, transparent);}
@@ -120,3 +122,18 @@ th{color:var(--a-faint);font-weight:600;font-size:11.5px;text-transform:uppercas
   .cal-item{display:none;}
   .cal-daynum{font-size:11px;}
 }
+
+.day-timeline-wrap{--hour-h:44px;overflow-x:auto;}
+.day-timeline{position:relative;border-inline-start:1px solid var(--a-line);min-width:320px;}
+.day-hour-row{position:absolute;left:0;right:0;height:var(--hour-h);border-top:1px solid var(--a-line);}
+.day-hour-label{position:absolute;top:-8px;inset-inline-start:6px;font-size:10.5px;color:var(--a-faint);background:var(--a-surface);padding:0 4px;}
+.day-shade{position:absolute;left:0;right:0;background:repeating-linear-gradient(45deg,#f1f2f4,#f1f2f4 6px,#e8e9eb 6px,#e8e9eb 12px);z-index:1;}
+.day-item{
+  position:absolute;border-radius:6px;padding:4px 8px;font-size:11.5px;line-height:1.35;overflow:hidden;z-index:2;
+  border:1px solid transparent;box-shadow:0 1px 3px rgba(0,0,0,.12);
+}
+.day-item strong{display:block;font-size:11px;}
+.day-item span{display:block;font-size:10.5px;opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.day-item.is-approved{background:var(--a-danger-tint);border-color:color-mix(in srgb, var(--a-danger) 35%, transparent);color:#7a221b;}
+.day-item.is-pending{background:var(--a-warn-tint);border-color:color-mix(in srgb, var(--a-warn) 40%, transparent);color:#6d5423;}
+.day-item.is-block{background:#e7e8ea;border-color:#c7cad0;color:#4a4d52;}

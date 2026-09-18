@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>מנהל מערכת</title>
-<link rel="stylesheet" href="<?= APP_BASE_URL ?>/assets/css/admin.css">
+<link rel="stylesheet" href="<?= APP_BASE_URL ?>/assets/css/admin.css?v=<?= filemtime(__DIR__ . '/../assets/css/admin.css') ?>">
 </head>
 <body>
 <header class="a-header">
