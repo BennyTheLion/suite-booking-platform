@@ -190,6 +190,15 @@ a{color:inherit;text-decoration:none;}
 .hero-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;background:color-mix(in srgb, var(--accent) 30%, transparent);border:1px solid color-mix(in srgb, var(--accent) 55%, transparent);color:#fff;font-size:11.5px;backdrop-filter:blur(6px);}
 .hero-pill .check{color:#4ade80;font-weight:900;}
 
+@media (max-width:639px){
+  .hero-cta-row{flex-wrap:nowrap;gap:6px;}
+  .hero-cta-row .pill-btn{flex:1;min-width:0;padding:11px 8px;font-size:12px;gap:5px;justify-content:center;}
+  .hero-cta-row .pill-btn svg{width:14px;height:14px;flex-shrink:0;}
+  .hero-cta-row .pill-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .hero-pills{flex-wrap:nowrap;gap:6px;}
+  .hero-pills .hero-pill{flex:1;min-width:0;justify-content:center;padding:7px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+}
+
 @media (hover:hover) and (pointer:fine){
   .hero-full:hover .hero-reveal-hint{opacity:0;pointer-events:none;}
   .hero-full:hover .hero-reveal-body{pointer-events:auto;}
