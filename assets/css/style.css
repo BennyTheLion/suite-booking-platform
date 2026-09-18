@@ -174,7 +174,7 @@ a{color:inherit;text-decoration:none;}
 .hero-reveal-body{pointer-events:none;}
 .hero-reveal-body h1,.hero-reveal-body .sub,.hero-reveal-body .hero-cta-row,.hero-reveal-body .hero-pills{
   opacity:0;transform:translateY(12px);
-  transition:opacity 300ms var(--ease-out), transform 300ms var(--ease-out);
+  transition:opacity 900ms var(--ease-out), transform 900ms var(--ease-out);
 }
 .hero-copy h1{font-family:var(--font-display);font-weight:500;font-size:clamp(26px,7vw,34px);line-height:1.28;margin:0 0 10px;text-wrap:balance;color:#ffffff;}
 .hero-copy .sub{font-size:14px;line-height:1.65;color:#dbe6ee;margin:0 0 6px;max-width:42ch;}
