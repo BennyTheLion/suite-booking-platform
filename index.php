@@ -288,7 +288,7 @@ require __DIR__ . '/includes/header.php';
       heroFull.classList.add('is-revealed');
     }
   });
-  setTimeout(function () { heroFull.classList.add('is-revealed'); }, 2000);
+  setTimeout(function () { heroFull.classList.add('is-revealed'); }, 1000);
 })();
 </script>
 
