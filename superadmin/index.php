@@ -49,7 +49,7 @@ require __DIR__ . '/_layout_top.php';
     </div>
     <div class="a-field-row">
       <div><label>שם משתמש למנהל האתר</label><input type="text" name="admin_username" value="admin"></div>
-      <div><label>סיסמת מנהל האתר</label><input type="text" name="admin_password" required></div>
+      <div><label>סיסמת מנהל האתר</label><div class="pwd-wrap"><input type="password" name="admin_password" required><?= pwd_toggle_button() ?></div></div>
     </div>
     <button class="a-btn" type="submit">יצירת אתר</button>
   </form>

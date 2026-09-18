@@ -43,6 +43,19 @@ input[type=text],input[type=password],input[type=email],input[type=tel],input[ty
   font-family:inherit;margin-bottom:12px;
 }
 textarea{min-height:80px;resize:vertical;}
+
+.pwd-wrap{position:relative;margin-bottom:12px;}
+.pwd-wrap input{margin-bottom:0;padding-inline-end:38px;}
+.pwd-toggle{
+  position:absolute;top:50%;inset-inline-end:4px;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;padding:6px;color:var(--a-faint);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+}
+.pwd-toggle:hover{color:var(--a-dim);}
+.pwd-toggle svg{width:18px;height:18px;}
+.pwd-toggle .eye-off{display:none;}
+.pwd-toggle.is-visible .eye-on{display:none;}
+.pwd-toggle.is-visible .eye-off{display:block;}
 .a-field-row{display:flex;gap:10px;}
 .a-field-row > *{flex:1;}
 .a-btn{

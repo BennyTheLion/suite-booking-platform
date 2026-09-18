@@ -375,6 +375,15 @@ function h(string $s): string {
     return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 }
 
+// Eye/eye-off toggle button for a password field. Wrap the <input type="password"> and this
+// together in a .pwd-wrap div; assets/js/pwd-toggle.js wires up the click handler.
+function pwd_toggle_button(): string {
+    return '<button type="button" class="pwd-toggle" aria-label="הצגת סיסמה">'
+        . '<svg class="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>'
+        . '<svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M9.9 5.1A11 11 0 0 1 12 5c7 0 11 7 11 7a13.5 13.5 0 0 1-3.1 3.9M6.6 6.6A13.6 13.6 0 0 0 1 12s4 7 11 7c1.4 0 2.7-.2 3.9-.6"/></svg>'
+        . '</button>';
+}
+
 // Inline SVG icons for the built-in facility keys, with a generic dot fallback for custom ones.
 function facility_icon_svg(string $fkey): string {
     $icons = [

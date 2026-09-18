@@ -41,11 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <label>שם משתמש</label>
       <input type="text" name="username" required autofocus>
       <label>סיסמה</label>
-      <input type="password" name="password" required>
+      <div class="pwd-wrap"><input type="password" name="password" required><?= pwd_toggle_button() ?></div>
       <?= csrf_field() ?>
       <button class="a-btn" type="submit" style="width:100%;">התחברות</button>
     </form>
   </div>
 </div>
+<script src="<?= APP_BASE_URL ?>/assets/js/pwd-toggle.js"></script>
 </body>
 </html>

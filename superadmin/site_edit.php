@@ -119,7 +119,7 @@ require __DIR__ . '/_layout_top.php';
           <form method="post" style="display:inline-flex;gap:4px;">
             <?= csrf_field() ?><input type="hidden" name="action" value="reset_password">
             <input type="hidden" name="admin_id" value="<?= (int) $a['id'] ?>">
-            <input type="text" name="new_password" placeholder="סיסמה חדשה" style="margin:0;width:130px;">
+            <div class="pwd-wrap" style="margin:0;width:130px;"><input type="password" name="new_password" placeholder="סיסמה חדשה" style="margin:0;"><?= pwd_toggle_button() ?></div>
             <button class="a-btn secondary small" type="submit">איפוס סיסמה</button>
           </form>
           <form method="post" style="display:inline;" onsubmit="return confirm('להסיר מנהל זה?');">
@@ -138,7 +138,7 @@ require __DIR__ . '/_layout_top.php';
   <form method="post" class="a-field-row" style="align-items:flex-end;">
     <?= csrf_field() ?><input type="hidden" name="action" value="add_admin">
     <div><label>שם משתמש</label><input type="text" name="username" required></div>
-    <div><label>סיסמה</label><input type="text" name="password" required></div>
+    <div><label>סיסמה</label><div class="pwd-wrap"><input type="password" name="password" required><?= pwd_toggle_button() ?></div></div>
     <div><button class="a-btn" type="submit">הוספת מנהל</button></div>
   </form>
 </div>
