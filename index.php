@@ -61,9 +61,10 @@ require __DIR__ . '/includes/header.php';
           <?php endif; ?>
         </div>
 
-        <?php if ($trustItems): ?>
+        <?php $trustItemsWithTitle = array_filter($trustItems, fn($item) => trim($item['title']) !== ''); ?>
+        <?php if ($trustItemsWithTitle): ?>
         <div class="hero-pills">
-          <?php foreach ($trustItems as $item): ?>
+          <?php foreach ($trustItemsWithTitle as $item): ?>
           <span class="hero-pill"><span class="check">✓</span> <?= h($item['title']) ?></span>
           <?php endforeach; ?>
         </div>

@@ -198,8 +198,7 @@ a{color:inherit;text-decoration:none;}
   .hero-pills{flex-wrap:nowrap;gap:6px;}
   .hero-pills .hero-pill{
     flex:1;min-width:0;justify-content:center;text-align:center;
-    background:none;border:none;backdrop-filter:none;padding:0;
-    white-space:normal;font-size:10.5px;line-height:1.25;color:#fff;
+    padding:7px 6px;white-space:normal;font-size:10.5px;line-height:1.25;
   }
   .hero-pills .hero-pill .check{display:none;}
 }
