@@ -1,5 +1,8 @@
 RewriteEngine On
 
+# Domain root -> the demo site
+RewriteRule ^$ index.php?site=demo [QSA,L]
+
 # Real files/dirs (admin/, superadmin/, assets/, uploads/) are served as-is — only unmatched paths fall through below.
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
