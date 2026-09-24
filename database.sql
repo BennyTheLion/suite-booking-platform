@@ -187,16 +187,23 @@ CREATE TABLE admin_notifications (
   FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE
 );
 
--- Seed: one demo site with placeholder branding, ready to fill from its admin panel
+-- Seed: one demo site with sample branding and rooms, ready to explore at /demo
+-- (upload real photos from its admin panel to replace the placeholders)
 INSERT INTO sites (slug, name, tagline, phone, whatsapp, email, address, location_text,
   trust1_title, trust1_text, trust2_title, trust2_text, trust3_title, trust3_text)
-VALUES ('demo', 'שם העסק שלך', 'תיאור קצר של העסק', '', '', '', '', '',
+VALUES ('demo', 'סוויטת האורן', 'סוויטות עיצוב פרטיות במרכז הצפון, להשכרה לפי שעה או ללילה', '050-1234567', '972501234567', 'demo@suite-booking.example', 'רחוב האורן 12, בנימינה', 'כניסה עצמאית, חניה חופשית ברחוב',
   'הפרטים שלכם נשארים בינינו', 'שם וטלפון בלבד, בלי שיתוף עם צד שלישי.',
   'ביטול חינם עד 3 שעות לפני', 'שינוי או ביטול מתבצע בהודעה בוואטסאפ, בלי חיוב.',
   'כניסה עצמאית, בלי דלפק קבלה', 'קוד כניסה נשלח בוואטסאפ קצת לפני השעה שנקבעה.');
 
-INSERT INTO rooms (site_id, name, slug, description, price_per_hour, price_per_day, price_3h, price_extra_hour, min_hours, capacity, size_sqm, bed_type)
-VALUES (1, 'חדר 1', 'room-1', 'תיאור החדר יופיע כאן.', 150, 600, 400, 100, 3, 2, 24, 'מיטה זוגית');
+INSERT INTO rooms (site_id, name, slug, description, price_per_hour, price_per_day, price_3h, price_extra_hour, min_hours, capacity, size_sqm, bed_type, sort_order)
+VALUES
+(1, 'סוויטת ענבר', 'room-amber', 'סוויטה מרווחת עם ג׳קוזי זוגי, תאורה רכה ומרפסת פרטית פונה לגינה. מושלמת לערב רומנטי או ללינה שקטה.', 150, 600, 400, 100, 3, 2, 26, 'מיטה זוגית', 1),
+(1, 'סוויטת קורל', 'room-coral', 'עיצוב תוסס עם קיר לבנים חשוף, מקלחת גשם ומיטה זוגית רחבה. כוללת מיני-בר ופינת ישיבה נעימה.', 180, 720, 440, 110, 3, 2, 28, 'מיטה זוגית רחבה', 2),
+(1, 'סוויטת זית', 'room-olive', 'סוויטה שקטה בגווני ירוק וטבע, עם ג׳קוזי פינתי וחלונות גדולים המשקיפים לחצר.', 140, 560, 380, 90, 3, 2, 22, 'מיטה זוגית', 3);
 
 INSERT INTO availability_schedule (room_id, weekday, is_closed, open_time, close_time)
-SELECT 1, w, 0, '00:00:00', '23:59:00' FROM (SELECT 0 w UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) t;
+SELECT r.id, w.n, 0, '00:00:00', '23:59:00'
+FROM rooms r
+JOIN (SELECT 0 n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) w(n)
+WHERE r.site_id = 1;
